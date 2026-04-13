@@ -1,0 +1,61 @@
+{
+  "intent": "email_triage",
+  "status": "completed",
+  "window_days": 7,
+  "missing_slots": [],
+  "dashboard": {
+    "today_priority_replies": [],
+    "high_priority_unhandled": [],
+    "threads_with_deadline": [],
+    "closed_threads": [],
+    "grouped_by_priority": {
+      "high": [],
+      "medium": [
+        {
+          "thread_id": "acct-default::msg-001",
+          "account_id": "default",
+          "subject": "Project status update",
+          "sender": "pm@example.com",
+          "priority": "medium",
+          "need_reply": "no",
+          "deadline": null
+        }
+      ],
+      "low": []
+    },
+    "need_reply_list": []
+  },
+  "thread_results": [
+    {
+      "thread_id": "acct-default::msg-001",
+      "account_id": "default",
+      "subject": "Project status update",
+      "sender": "pm@example.com",
+      "priority": "medium",
+      "need_reply": "no",
+      "is_closed": false,
+      "closure_signal": null,
+      "closure_reason": "",
+      "summary": "项目经理同步了当前状态，没有直接要求回复。",
+      "deadline": null,
+      "todo_items": [],
+      "entities": {
+        "people": [
+          "pm@example.com"
+        ],
+        "organizations": [],
+        "locations": [],
+        "times": []
+      },
+      "attachments": [],
+      "review_needed": false,
+      "reasoning_summary": [
+        "事项与工作协作相关，重要性为 medium。",
+        "无明确 deadline 或直接动作请求，紧急性为 low。",
+        "综合映射后 priority 为 medium，need_reply 为 no。"
+      ],
+      "recommended_actions": []
+    }
+  ],
+  "next_action": "Review medium-priority items when convenient."
+}

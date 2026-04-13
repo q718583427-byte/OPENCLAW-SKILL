@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Email Triage Output Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intent",
+    "status",
+    "window_days",
+    "missing_slots",
+    "dashboard",
+    "thread_results",
+    "next_action"
+  ],
+  "properties": {
+    "intent": {
+      "type": "string",
+      "const": "email_triage"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "partial",
+        "needs_input"
+      ]
+    },
+    "window_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "missing_slots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dashboard": {
+      "$ref": "#/$defs/dashboard"
+    },
+    "thread_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thread_result"
+      }
+    },
+    "next_action": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "need_reply": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "closure_signal": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "confirmed_by_recipient",
+        "user_handled",
+        "action_completed",
+        "timeout_inactive",
+        "explicit_close",
+        "resolution_detected",
+        null
+      ]
+    },
+    "dashboard_thread_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thread_id",
+        "account_id",
+        "subject",
+        "sender",
+        "priority",
+        "need_reply",
+        "deadline"
+      ],
+      "properties": {
+        "thread_id": {
+          "type": "string"
+        },
+        "account_id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "need_reply": {
+          "$ref": "#/$defs/need_reply"
+        },
+        "deadline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "today_priority_replies",
+        "high_priority_unhandled",
+        "threads_with_deadline",
+        "closed_threads",
+        "grouped_by_priority",
+        "need_reply_list"
+      ],
+      "properties": {
+        "today_priority_replies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dashboard_thread_item"
+          }
+        },
+        "high_priority_unhandled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dashboard_thread_item"
+          }
+        },
+        "threads_with_deadline": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dashboard_thread_item"
+          }
+        },
+        "closed_threads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dashboard_thread_item"
+          }
+        },
+        "grouped_by_priority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "properties": {
+            "high": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dashboard_thread_item"
+              }
+            },
+            "medium": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dashboard_thread_item"
+              }
+            },
+            "low": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dashboard_thread_item"
+              }
+            }
+          }
+        },
+        "need_reply_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dashboard_thread_item"
+          }
+        }
+      }
+    },
+    "todo_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content",
+        "origin",
+        "deadline",
+        "confidence"
+      ],
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "explicit",
+            "inferred"
+          ]
+        },
+        "deadline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium"
+          ]
+        }
+      }
+    },
+    "entities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "people",
+        "organizations",
+        "locations",
+        "times"
+      ],
+      "properties": {
+        "people": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "times": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "brief",
+        "manual_review_needed"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "brief": {
+          "type": "string"
+        },
+        "manual_review_needed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "thread_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thread_id",
+        "account_id",
+        "subject",
+        "sender",
+        "priority",
+        "need_reply",
+        "is_closed",
+        "closure_signal",
+        "closure_reason",
+        "summary",
+        "deadline",
+        "todo_items",
+        "entities",
+        "attachments",
+        "review_needed",
+        "reasoning_summary",
+        "recommended_actions"
+      ],
+      "properties": {
+        "thread_id": {
+          "type": "string"
+        },
+        "account_id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "need_reply": {
+          "$ref": "#/$defs/need_reply"
+        },
+        "is_closed": {
+          "type": "boolean"
+        },
+        "closure_signal": {
+          "$ref": "#/$defs/closure_signal"
+        },
+        "closure_reason": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "todo_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/todo_item"
+          }
+        },
+        "entities": {
+          "$ref": "#/$defs/entities"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment"
+          }
+        },
+        "review_needed": {
+          "type": "boolean"
+        },
+        "reasoning_summary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "draft_reply",
+              "add_todo",
+              "archive",
+              "snooze"
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "is_closed": {
+                "const": true
+              }
+            },
+            "required": [
+              "is_closed"
+            ]
+          },
+          "then": {
+            "properties": {
+              "closure_signal": {
+                "type": "string",
+                "enum": [
+                  "confirmed_by_recipient",
+                  "user_handled",
+                  "action_completed",
+                  "timeout_inactive",
+                  "explicit_close",
+                  "resolution_detected"
+                ]
+              },
+              "closure_reason": {
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
