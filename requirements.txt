@@ -1,0 +1,7 @@
+# Email skill runtime dependencies
+# Install with: pip install -r requirements.txt
+
+# Core email processing
+PyMuPDF>=1.23.0        # PDF extraction
+python-docx>=1.0.0     # DOCX extraction
+openpyxl>=3.1.0       # XLSX extraction

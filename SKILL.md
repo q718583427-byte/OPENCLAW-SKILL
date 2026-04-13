@@ -29,14 +29,21 @@ capabilities:
       - body_truncation
       - attachment_metadata
       - reply_headers
+    script: "scripts/email_fetch.py"
   attachment_extract:
     description: "读取 PDF/DOCX/XLSX 附件正文内容"
     formats:
       - PDF
       - DOCX
       - XLSX
+    script: "scripts/attachment_extract.py"
   thread_inspect:
     description: "检查邮件线程历史，支持 INBOX/Sent 等文件夹，获取 reply headers 和已发邮件证据"
+    script: "scripts/thread_inspect.py"
+  dependencies:
+    - PyMuPDF>=1.23.0
+    - python-docx>=1.0.0
+    - openpyxl>=3.1.0
 ---
 
 # Email Triage and Priority Reply
