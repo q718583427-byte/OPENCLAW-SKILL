@@ -15,22 +15,189 @@ This skill helps you quickly identify which emails need attention across recent 
 - **Chinese Reply Draft Generation** — draft-ready, not auto-sent
 - **Dashboard Organization** — priority lists, deadline threads, closed threads
 
-## Capability Requirements
+## Installation
 
-This skill requires an email runtime with these capabilities:
+```bash
+# Clone the skill
+git clone -b master https://github.com/q718583427-byte/OPENCLAW-SKILL.git
 
-| Capability | Description |
-|------------|-------------|
-| `email_accounts` | IMAP + SMTP multi-account configuration (QQ, 163, Gmail, etc.) |
-| `email_fetch` | Fetch emails by date range, account filtering, body truncation, attachment metadata |
-| `attachment_extract` | Read PDF / DOCX / XLSX attachment content |
-| `thread_inspect` | Inspect thread history, access INBOX/Sent folders, get reply headers |
+# Install Python dependencies
+cd OPENCLAW-SKILL/email-triage-openclaw
+pip install -r requirements.txt
+```
+
+## IMAP Configuration
+
+This skill supports multiple email providers. Configure your accounts in a JSON file:
+
+### Gmail
+
+```json
+{
+  "email_accounts": {
+    "gmail": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "gmail",
+      "imap_host": "imap.gmail.com",
+      "imap_port": 993,
+      "imap_username": "your_email@gmail.com",
+      "imap_password": "YOUR_APP_PASSWORD",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_username": "your_email@gmail.com",
+      "smtp_password": "YOUR_APP_PASSWORD",
+      "from_address": "your_email@gmail.com"
+    }
+  }
+}
+```
+
+**Note:** Gmail requires an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password. Enable 2FA first, then generate an App Password.
+
+### Outlook / Hotmail
+
+```json
+{
+  "email_accounts": {
+    "outlook": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "outlook",
+      "imap_host": "outlook.office365.com",
+      "imap_port": 993,
+      "imap_username": "your_email@outlook.com",
+      "imap_password": "YOUR_APP_PASSWORD",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.office365.com",
+      "smtp_port": 587,
+      "smtp_username": "your_email@outlook.com",
+      "smtp_password": "YOUR_APP_PASSWORD",
+      "from_address": "your_email@outlook.com"
+    }
+  }
+}
+```
+
+**Note:** Microsoft accounts may require an [App Password](https://support.microsoft.com/en-us/account-billing/how-to-get-two-step-verification-codes-6a18f098-d421-4e9d-b62a-6048dddf930c) if 2FA is enabled.
+
+### 163.com (网易邮箱)
+
+```json
+{
+  "email_accounts": {
+    "163": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "163",
+      "imap_host": "imap.163.com",
+      "imap_port": 993,
+      "imap_username": "your_email@163.com",
+      "imap_password": "YOUR_AUTHORIZATION_CODE",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.163.com",
+      "smtp_port": 465,
+      "smtp_username": "your_email@163.com",
+      "smtp_password": "YOUR_AUTHORIZATION_CODE",
+      "from_address": "your_email@163.com"
+    }
+  }
+}
+```
+
+**Note:** 163邮箱需要开启 IMAP/SMTP 服务并获取[授权码](https://mail.163.com/html/addition/2016/08/201608241726560011_0.html)。
+
+### QQ 邮箱
+
+```json
+{
+  "email_accounts": {
+    "qq": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "qq",
+      "imap_host": "imap.qq.com",
+      "imap_port": 993,
+      "imap_username": "your_email@qq.com",
+      "imap_password": "YOUR_AUTHORIZATION_CODE",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.qq.com",
+      "smtp_port": 587,
+      "smtp_username": "your_email@qq.com",
+      "smtp_password": "YOUR_AUTHORIZATION_CODE",
+      "from_address": "your_email@qq.com"
+    }
+  }
+}
+```
+
+**Note:** QQ邮箱需要开启 IMAP/SMTP 服务并获取[授权码](https://service.mail.qq.com/cgi-bin/help?subtype=1&&no=1001256&&id=28)。
+
+### Multi-Account Configuration
+
+```json
+{
+  "email_accounts": {
+    "qq": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "qq",
+      "imap_host": "imap.qq.com",
+      "imap_port": 993,
+      "imap_username": "your_email@qq.com",
+      "imap_password": "YOUR_AUTHORIZATION_CODE",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.qq.com",
+      "smtp_port": 587,
+      "smtp_username": "your_email@qq.com",
+      "smtp_password": "YOUR_AUTHORIZATION_CODE",
+      "from_address": "your_email@qq.com"
+    },
+    "gmail": {
+      "enabled": true,
+      "consent_granted": true,
+      "account_id": "gmail",
+      "imap_host": "imap.gmail.com",
+      "imap_port": 993,
+      "imap_username": "your_email@gmail.com",
+      "imap_password": "YOUR_APP_PASSWORD",
+      "imap_mailbox": "INBOX",
+      "smtp_host": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_username": "your_email@gmail.com",
+      "smtp_password": "YOUR_APP_PASSWORD",
+      "from_address": "your_email@gmail.com"
+    }
+  }
+}
+```
 
 ## Usage
 
-Trigger with `$email-triage-openclaw` or `$email-triage-openclaw <request>`.
+### Using Scripts Directly
 
-### Examples
+```bash
+# Fetch emails from configured accounts
+python scripts/email_fetch.py \
+  --config config.json \
+  --output emails.json \
+  --days 7 \
+  --limit 100
+
+# Extract content from an attachment
+python scripts/attachment_extract.py \
+  --input document.pdf \
+  --output content.json
+
+# Inspect a thread by Message-ID
+python scripts/thread_inspect.py \
+  --config config.json \
+  --message-id "<abc123@example.com>" \
+  --output thread.json
+```
+
+### Trigger Examples
 
 ```
 整理今天邮件并告诉先处理什么
@@ -44,18 +211,25 @@ Trigger with `$email-triage-openclaw` or `$email-triage-openclaw <request>`.
 ```
 email-triage-openclaw/
 ├── SKILL.md                      # Main skill definition
-└── references/
-    ├── output_schema.json         # JSON output schema
-    ├── output_example.json        # Output example
-    ├── priority_rules.md          # Detailed priority rules
-    └── safety_and_fallback.md     # Safety guidelines
+├── scripts/
+│   ├── email_fetch.py            # Email fetching tool
+│   ├── attachment_extract.py     # Attachment extraction tool
+│   └── thread_inspect.py         # Thread inspection tool
+├── references/
+│   ├── output_schema.json        # JSON output schema
+│   ├── output_example.json        # Output example
+│   ├── priority_rules.md          # Detailed priority rules
+│   └── safety_and_fallback.md     # Safety guidelines
+└── requirements.txt              # Python dependencies
 ```
 
-## Output Format
+## Dependencies
 
-The skill outputs:
-1. Natural language summary (Chinese)
-2. Structured JSON dashboard with priority classifications
+| Package | Version | Purpose |
+|---------|---------|---------|
+| PyMuPDF | >=1.23.0 | PDF extraction |
+| python-docx | >=1.0.0 | DOCX extraction |
+| openpyxl | >=3.1.0 | XLSX extraction |
 
 ## License
 
