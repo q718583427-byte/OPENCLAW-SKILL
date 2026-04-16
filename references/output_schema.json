@@ -46,6 +46,19 @@
     },
     "next_action": {
       "type": "string"
+    },
+    "focus": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "求职",
+        "学校",
+        "工作",
+        "通用",
+        null
+      ]
     }
   },
   "$defs": {
@@ -380,6 +393,12 @@
               "snooze"
             ]
           }
+        },
+        "draft_content": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "allOf": [
